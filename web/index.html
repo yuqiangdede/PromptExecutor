@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>工作台</title>
+    <link rel="stylesheet" href="/style.css">
+  </head>
+  <body>
+    <div class="backdrop"></div>
+    <main class="layout">
+      <aside class="sidebar">
+        <div class="sidebar__group">
+          <button class="sidebar__btn" id="lmConfigBtn" type="button">语言模型设置</button>
+          <button class="sidebar__btn" id="imgConfigBtn" type="button">生图模型设置</button>
+        </div>
+        <div class="sidebar__group">
+          <div class="sidebar__label">提示词列表</div>
+          <div class="prompt-tree prompt-tree--sidebar" id="promptList"></div>
+          <span class="config-status" id="promptStatus"></span>
+        </div>
+        <div class="sidebar__group">
+          <div class="sidebar__label">LLM 输入/输出日志</div>
+          <div class="sidebar__log">
+            <button class="btn btn--ghost btn--small" id="toggleLogBtn" type="button">开启完整日志</button>
+            <span class="config-status" id="logStatus"></span>
+          </div>
+        </div>
+      </aside>
+      <section class="chat">
+        <div class="card">
+          <div class="card__head">
+            <h2>对话工作台</h2>
+            <span class="card__count" id="chatCount">0 条消息</span>
+          </div>
+          <div class="chat__list" id="chatList"></div>
+          <div class="chat__input">
+            <label for="chatInput">输入内容</label>
+            <textarea id="chatInput" placeholder="输入需求或补充说明，回车发送，Shift+Enter 换行。"></textarea>
+            <div class="chat__actions">
+              <button class="btn btn--ghost" id="clearBtn" type="button">清空对话</button>
+              <button class="btn btn--primary" id="sendBtn" type="button">发送</button>
+            </div>
+            <div class="status" id="status"></div>
+          </div>
+          <div class="history history--collapsed" id="historySection">
+            <div class="history__header">
+              <div class="history__title-row">
+                <h3 class="history__title">输入历史</h3>
+                <span class="config-status" id="historyStatus">已保存 0 条</span>
+              </div>
+              <div class="history__tools">
+                <input class="history__search" id="historySearch" type="text" placeholder="搜索关键词">
+                <button class="btn btn--ghost btn--small" id="toggleHistoryBtn" type="button">展开</button>
+              </div>
+            </div>
+            <div class="history-list" id="historyList"></div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <div class="modal modal--hidden" id="lmConfigModal" role="dialog" aria-modal="true" aria-labelledby="lmConfigTitle">
+      <div class="modal__backdrop" data-modal-close="true"></div>
+      <div class="modal__panel">
+        <div class="modal__head">
+          <h3 id="lmConfigTitle">语言模型配置</h3>
+          <button class="btn btn--ghost btn--small" id="closeLmConfigBtn" type="button">关闭</button>
+        </div>
+        <div class="config-card config-card--modal">
+          <div class="config-field">
+            <label for="apiKeyInput">API_KEY</label>
+            <div class="config-inline">
+              <input id="apiKeyInput" type="password" placeholder="请输入 API Key">
+              <button class="btn btn--ghost btn--small" id="toggleKeyBtn" type="button">显示</button>
+            </div>
+          </div>
+          <div class="config-field">
+            <label for="modelInput">MODEL</label>
+            <input id="modelInput" type="text" placeholder="例如：mimo-v2-flash">
+          </div>
+          <div class="config-field">
+            <label for="baseUrlInput">BASE_URL</label>
+            <input id="baseUrlInput" type="text" placeholder="https://api.qnaigc.com/v1/chat/completions">
+          </div>
+          <div class="config-actions">
+            <button class="btn btn--primary btn--small" id="saveConfigBtn" type="button">应用配置</button>
+            <span class="config-status" id="configStatus"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal modal--hidden" id="imgConfigModal" role="dialog" aria-modal="true" aria-labelledby="imgConfigTitle">
+      <div class="modal__backdrop" data-modal-close="true"></div>
+      <div class="modal__panel">
+        <div class="modal__head">
+          <h3 id="imgConfigTitle">生图模型配置</h3>
+          <button class="btn btn--ghost btn--small" id="closeImgConfigBtn" type="button">关闭</button>
+        </div>
+        <div class="config-card config-card--modal">
+          <div class="config-field">
+            <label for="imgApiKeyInput">IMG_API_KEY</label>
+            <input id="imgApiKeyInput" type="password" placeholder="请输入生图 API Key">
+          </div>
+          <div class="config-field">
+            <label for="imgModelInput">IMG_MODEL</label>
+            <input id="imgModelInput" type="text" placeholder="例如：image-model">
+          </div>
+          <div class="config-field">
+            <label for="imgBaseUrlInput">IMG_BASE_URL</label>
+            <input id="imgBaseUrlInput" type="text" placeholder="https://example.com/v1/chat/completions">
+          </div>
+          <div class="config-actions">
+            <button class="btn btn--primary btn--small" id="saveImgConfigBtn" type="button">应用配置</button>
+            <span class="config-status" id="imgConfigStatus"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal modal--hidden" id="promptTransferModal" role="dialog" aria-modal="true" aria-labelledby="promptTransferTitle">
+      <div class="modal__backdrop" data-modal-close="true"></div>
+      <div class="modal__panel">
+        <div class="modal__head">
+          <h3 id="promptTransferTitle">选择提示词</h3>
+          <button class="btn btn--ghost btn--small" id="closePromptTransferBtn" type="button">关闭</button>
+        </div>
+        <div class="prompt-transfer">
+          <div class="prompt-tree" id="promptTransferList"></div>
+          <button class="btn btn--primary" id="transferImageBtn" type="button">生图模型</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
